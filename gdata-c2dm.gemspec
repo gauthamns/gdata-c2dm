@@ -7,16 +7,17 @@ require "gdata-c2dm/version"
 Gem::Specification.new do |s|
   s.name        = "gdata-c2dm"
   s.version     = GdataC2dm::VERSION
-  s.authors     = ["TODO: Your name"]
-  s.email       = ["TODO: Your email"]
-  s.homepage    = "TODO"
-  s.summary     = "TODO: Summary of GdataC2dm."
-  s.description = "TODO: Description of GdataC2dm."
+  s.authors     = ["Gautham NS"]
+  s.email       = ["gautham@ppprep.com"]
+  s.homepage    = "http://gauthamns.com"
+  s.summary     = "GData for Google data."
+  s.description = "GData clone with C2DM included."
 
-  s.files = Dir["{app,config,db,lib}/**/*"] + ["MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{app,config,db,lib}/**/*"] + ["LICENSE", "Rakefile", "README"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "~> 3.1.3"
+  s.add_dependency "rails", "~> 3.1.1"
+  s.add_dependency "gdata", "1.1.2"
 
   s.add_development_dependency "sqlite3"
 end
