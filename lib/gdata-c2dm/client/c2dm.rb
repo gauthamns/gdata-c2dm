@@ -22,9 +22,12 @@ module GData
       end
 
       def send_c2dmessage(registration_id, collapse_key, data, delay_while_idle, auth_token)
-        body = "registration_id=#{registration_id}&collapse_key=#{collapse_key}" +
-          "data=#{data}&AUTH_TOKEN=#{auth_token}"
-        body += "&delay_while_idle=#{delay_while_idle}" if delay_while_idle
+        body = Hash.new
+        body["registration_id"] = registration_id
+        body["collapse_key"] = collapse_key
+        body["data.message"] = data
+        body["delay_while_idle"] = delay_while_idle if delay_while_idle
+        body["AUTH_TOKEN"] = auth_token
 
         self.make_request(:post, @c2dm_url, body)
       end
