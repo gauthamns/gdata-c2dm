@@ -26,7 +26,6 @@ module GData
         body["registration_id"] = registration_id
         body["collapse_key"] = collapse_key
         body["delay_while_idle"] = delay_while_idle if delay_while_idle
-        body["AUTH_TOKEN"] = auth_token
 
         self.make_request(:post, @c2dm_url, body)
       end
