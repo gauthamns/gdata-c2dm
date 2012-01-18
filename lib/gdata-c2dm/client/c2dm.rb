@@ -31,7 +31,7 @@ module GData
       end
 
       def prepare_headers
-        headers = super.prepare_headers
+        headers = super
         headers['Authorization: GoogleLogin auth'] = @token
         headers
       end
