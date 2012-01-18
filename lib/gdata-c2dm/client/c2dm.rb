@@ -21,15 +21,20 @@ module GData
         @token = auth_token
       end
 
-      def send_c2dmessage(registration_id, collapse_key, data, delay_while_idle, auth_token)
-        body = Hash.new
+      def send_c2dmessage(registration_id, collapse_key, delay_while_idle, data_hash)
+        body = data_hash
         body["registration_id"] = registration_id
         body["collapse_key"] = collapse_key
-        body["data.message"] = data
         body["delay_while_idle"] = delay_while_idle if delay_while_idle
         body["AUTH_TOKEN"] = auth_token
 
         self.make_request(:post, @c2dm_url, body)
+      end
+
+      def prepare_headers
+        headers = super.prepare_headers
+        headers['Authorization: GoogleLogin auth'] = @token
+        headers
       end
     end
   end
