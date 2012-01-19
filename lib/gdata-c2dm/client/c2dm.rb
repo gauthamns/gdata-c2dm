@@ -39,6 +39,8 @@ module GData
       def prepare_headers
         headers = super
         headers['Authorization'] = "GoogleLogin auth=#{@token}"
+        # Content type is url encoded.
+        headers['Content-Type'] = "application/x-www-form-urlencoded"
         headers
       end
     end
