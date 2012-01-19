@@ -22,12 +22,18 @@ module GData
       end
 
       def send_c2dmessage(registration_id, collapse_key, delay_while_idle, data_hash)
-        body = data_hash
-        body["registration_id"] = registration_id
-        body["collapse_key"] = collapse_key
-        body["delay_while_idle"] = delay_while_idle if delay_while_idle
+        body_hash = {}
+        body_hash["registration_id"] = registration_id
+        body_hash["collapse_key"] = collapse_key
+        body_hash["delay_while_idle"] = delay_while_idle if delay_while_idle
 
-        self.make_request(:post, @c2dm_url, body)
+        data_hash.each do |key, value|
+          body_hash["data.#{key}"] = value
+        end
+        
+        data =
+          body_hash.map{|k, v| "&#{k}=#{URI.escape(v.to_s)}"}.reduce{|k, v| k + v}
+        self.make_request(:post, @c2dm_url, data)
       end
 
       def prepare_headers
