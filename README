@@ -1,4 +1,39 @@
-This project is a work in progress. It is still not ready to be adopted.
+This gem is for sending C2DM message to an android device. It depends on gdata gem
+provided by Google.
 
-I will update the README once ready to be used. You are free to see
-and make changes and send a pull request.
+How to use?
+
+c2dm_sender = GData::Client::C2dm.new()
+
+Get Google AuthLogin token:
+auth_token = c2dm_sender.clientlogin(username, password, nil, nil, 'ac2dm')
+
+Auth token should be stored by the application.
+
+To send the c2dmessage:
+c2dm_sender.set_clientlogin_token(auth_token)
+c2dm_sender.send_c2dmessage(registration_id, collapse_key, delay_while_idle, data_hash)
+
+data_hash format:
+data_hash = Hash.new
+data_hash['body'] = body
+data_hash['mykey'] = my_value
+
+FAQ:
+
+1. Will it automatically obtain AuthToken and send C2DMessage?
+No. We have to manually obtain the AuthToken by clientlogin function and store it
+with us. We will have to supply it to send the c2dmessage.
+The reason for this is that we need not fetch AuthToken everytime we send C2dmessage.
+Once obtained, we should use the same till it expires.
+
+2. AutoRenewal of AuthToken. Will it automatically fetch the new AuthToken if expired?
+Currently not supported. Will have to find a way to do it.
+
+3. Bulk message delivery?
+No. We have to send one C2DMessage at a time. In the pipeline.
+
+This gem is still a work in progress. Will be adding lot many things as and when
+need arises. You are free to adapt and contribute.
+
+Thanks.
