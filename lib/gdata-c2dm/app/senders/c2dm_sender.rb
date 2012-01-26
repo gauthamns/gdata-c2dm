@@ -41,7 +41,7 @@ class C2dmSender
     while (!is_sent)
       begin
         response =
-                get_c2dm.send_c2dmessage(nil, @collapse_key, @delay_while_idle, @data_hash)
+                get_c2dm.send_c2dmessage(registration_id, @collapse_key, @delay_while_idle, @data_hash)
         is_sent = true
       rescue GData::Client::AuthorizationError
         # The AUTH Login is wrong. Generate a new auth login.
