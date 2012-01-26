@@ -30,10 +30,27 @@ module GData
         data_hash.each do |key, value|
           body_hash["data.#{key}"] = value
         end
-        
-        data =
-          body_hash.map{|k, v| "&#{k}=#{URI.escape(v.to_s)}"}.reduce{|k, v| k + v}
-        self.make_request(:post, @c2dm_url, data)
+
+        data = body_hash.map { |k, v| "&#{k}=#{URI.escape(v.to_s)}" }.reduce { |k, v| k + v }
+        response = self.make_request(:post, @c2dm_url, data)
+        if response.body == "Error=InvalidRegistration"
+          raise GData::Client::InvalidRegistrationError.new(response)
+        elsif response.body == "Error=QuotaExceeded"
+          raise GData::Client::QuotaExceededError.new(response)
+        elsif response.body == "Error=DeviceQuotaExceeded"
+          raise GData::Client::DeviceQuotaExceededError.new(response)
+        elsif response.body == "Error=MissingRegistration"
+          raise GData::Client::MissingRegistrationError.new(response)
+        elsif response.body == "Error=MismatchSenderId"
+          raise GData::Client::MismatchSenderIdError.new(response)
+        elsif response.body == "Error=MessageTooBig"
+          raise GData::Client::MessageTooBigError.new(response)
+        elsif response.body == "Error=NotRegistered"
+          raise GData::Client::NotRegisteredError.new(response)
+        elsif response.body == "Error=MissingCollapseKey"
+          raise GData::Client::MissingCollapseKeyError.new(response)
+        end
+        response
       end
 
       def prepare_headers
@@ -43,6 +60,29 @@ module GData
         headers['Content-Type'] = "application/x-www-form-urlencoded"
         headers
       end
+    end
+
+    class InvalidRegistrationError < RequestError
+    end
+
+    class QuotaExceededError < RequestError
+    end
+
+    class DeviceQuotaExceededError < RequestError
+    end
+
+    class MissingRegistrationError < RequestError
+    end
+    class MismatchSenderIdError < RequestError
+    end
+
+    class MessageTooBigError < RequestError
+    end
+
+    class NotRegisteredError < RequestError
+    end
+
+    class MissingCollapseKeyError < RequestError
     end
   end
 end
