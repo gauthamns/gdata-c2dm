@@ -12,15 +12,9 @@ class C2dmSender
   attr_accessor :google_service
 
 
-  def notification(message)
-    @registration_ids = message.receivers
-    @data_hash = Hash.new
-
-    # TODO: We should not have C2DM related coding here. Need to remove data.
-    @data_hash['body'] = message.body
-    @data_hash['message_id'] = message.id.to_s
-    @data_hash['service_id'] = message.service_id.to_s
-    @data_hash['timestamp'] = Time.now.to_s
+  def notification(registration_ids, data_hash)
+    @registration_ids = registration_ids
+    @data_hash = data_hash
 
     # Return Self object.
     self
@@ -36,7 +30,6 @@ class C2dmSender
   # This is used to deliver to a single device.
   def deliver_each(registration_id)
     is_sent = false
-    # Duration for sleeping
 
     while (!is_sent)
       begin
@@ -49,7 +42,7 @@ class C2dmSender
       rescue GData::Client::ServerError
         # Nothing simply retry after sleeping for 3 secs.
         sleep @sleep_sec * 3
-        @sleep_sec += 1
+        @sleep_sec = @sleep_sec * 2
 
       rescue GData::Client::InvalidRegistrationError
         response = $!.response
@@ -73,7 +66,7 @@ class C2dmSender
         @data_hash['body'] = @data_hash['body'][0..150]
       rescue GData::Client::MissingCollapseKeyError
         # Set the collapse key and retry.
-        @collapse_key = 'fastinfo'
+        @collapse_key = 'default'
       end
     end
 
@@ -110,7 +103,7 @@ class C2dmSender
 
   def initialize
     # Initialize variables.
-    @collapse_key = "fastinfo"
+    @collapse_key = "default"
     @delay_while_idle = false
     @google_service = 'ac2dm'
     @config = YAML::load(ERB.new(IO.read(
