@@ -1,7 +1,8 @@
 This gem is for sending C2DM message to an android device. It depends on gdata_19 gem.
 
 
-Installation.
+Installation:
+
 In the Gemfile:
 gem 'gdata-c2dm'
 
@@ -59,21 +60,6 @@ How to use?
     data_hash = get_data_hash(message)
     sender.notification(registration_ids, data_hash).deliver
 
-
-Get Google AuthLogin token:
-c2dm_sender = GData::Client::C2dm.new()
-auth_token = c2dm_sender.clientlogin(username, password, nil, nil, 'ac2dm')
-
-Auth token should be stored in the model GoogleInfo.
-
-To send the c2dmessage:
-c2dm_sender.set_clientlogin_token(auth_token)
-c2dm_sender.send_c2dmessage(registration_id, collapse_key, delay_while_idle, data_hash)
-
-data_hash format:
-data_hash = Hash.new
-data_hash['body'] = body
-data_hash['mykey'] = my_value
 
 FAQ:
 
