@@ -1,14 +1,70 @@
-This gem is for sending C2DM message to an android device. It depends on gdata gem
-provided by Google.
+This gem is for sending C2DM message to an android device. It depends on gdata_19 gem.
+
+
+Installation.
+In the Gemfile:
+gem 'gdata-c2dm'
+
+Then run bundle install to install the gem.
+
+The email and password details of the registered email should be stored in the
+file google_data.yml in config/initializers directory.
+
+Sample config/initializers/google_data.yml file.
+
+defaults: &defaults
+  allow_dynamic_fields: true
+
+development:
+  username: <email>
+  password: <password>
+
+production:
+  username: <email>
+  password: <password>
+
+The gem also makes use of a model to store the clientlogin token so that
+it won't get a new one every time it is called. So create a model with the name
+GoogleInfo
+
+Create a file in app/models/google_info.rb with the following fields:
+  field :username, :type => String # Google username.
+  field :google_service, :type => String # Google service name. Ex: ac2dm, cl
+  field :clientauth_token, :type => String # Google client auth token for the service.
+
+Sample file for Mongoid:
+app/models/google_info.rb
+
+class GoogleInfo
+  include Mongoid::Document
+  include Mongoid::Timestamps
+
+  field :username, :type => String # Google username.
+  field :google_service, :type => String # Google service name. Ex: ac2dm, cl
+  field :clientauth_token, :type => String # Google client auth token for the service.
+
+  validates_presence_of :username, :google_service, :clientauth_token
+  validates_uniqueness_of :username, :scope => :google_service
+end
 
 How to use?
 
-c2dm_sender = GData::Client::C2dm.new()
+    # data_hash should be the data which is sent(Data should be sent in key value pairs to google)
+    data_hash = Hash.new
+    data_hash['timestamp'] = Time.now.to_s
+    data_hash['<key>'] = <value>
+
+    # To send the message:
+    sender = C2dmSender.new
+    data_hash = get_data_hash(message)
+    sender.notification(registration_ids, data_hash).deliver
+
 
 Get Google AuthLogin token:
+c2dm_sender = GData::Client::C2dm.new()
 auth_token = c2dm_sender.clientlogin(username, password, nil, nil, 'ac2dm')
 
-Auth token should be stored by the application.
+Auth token should be stored in the model GoogleInfo.
 
 To send the c2dmessage:
 c2dm_sender.set_clientlogin_token(auth_token)
@@ -22,18 +78,17 @@ data_hash['mykey'] = my_value
 FAQ:
 
 1. Will it automatically obtain AuthToken and send C2DMessage?
-No. We have to manually obtain the AuthToken by clientlogin function and store it
-with us. We will have to supply it to send the c2dmessage.
-The reason for this is that we need not fetch AuthToken everytime we send C2dmessage.
-Once obtained, we should use the same till it expires.
+Yes. It will manage the auth token lifecycle itself. For this we should supply GoogleInfo model.
 
 2. AutoRenewal of AuthToken. Will it automatically fetch the new AuthToken if expired?
-Currently not supported. Will have to find a way to do it.
+Yes. It will manage the auth token key itself.
 
 3. Bulk message delivery?
-No. We have to send one C2DMessage at a time. In the pipeline.
+Yes. Currently messages are delivered one by one in a loop.
 
 This gem is still a work in progress. Will be adding lot many things as and when
 need arises. You are free to adapt and contribute.
 
-Thanks.
+TODO:
+1. Currently it will loop through the registration ids and send one msg at a time.
+We should use multithreading to speed up the process.
